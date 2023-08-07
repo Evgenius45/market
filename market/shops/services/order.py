@@ -16,8 +16,6 @@ def pryce_delivery(r_user: Any) -> dict:
         .select_related("offer__product", "offer__shop")
         .annotate(summ_offer=F("offer__price") * F("quantity"))
     )
-    if not cart_list:
-        return {}
     min_price_offer = Decimal(2000.00)
     delivery_express = Decimal(500.00)
     delivery_ordinary = Decimal(200.00)

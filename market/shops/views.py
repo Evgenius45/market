@@ -129,11 +129,11 @@ class CreateOrderView(TemplateView):
 
     def get(self, request, *args, **kwargs) -> HttpResponse:
         """Оформления заказа если корзина не пуста и пользователь залогинен"""
+        if not request.session["cart"]:
+            return redirect("catalog:show_product")
         cart_list = None
         if self.request.user.is_authenticated:
             cart_list = pryce_delivery(self.request.user)
-            if not cart_list:
-                return redirect("catalog:show_product")
         context = {
             "form_log": OderLoginUserForm(),
             "cart_list": cart_list,
@@ -152,15 +152,13 @@ class CreateOrderView(TemplateView):
                 if user:
                     login(self.request, user)
                     return redirect("order")
-            else:
-                return render(
-                    self.request,
-                    "market/order/order.jinja2",
-                    context={
-                        "text": "Неправильный ввод эмейла или пароля",
-                        "user": self.request.user,
-                    },
-                )
+                else:
+                    return render(request, "market/order/order.jinja2", context={
+                            "text": "Неправильный ввод эмейла или пароля",
+                            "user": self.request.user,
+                            "form_log": OderLoginUserForm(),
+                        },
+                    )
         new_order_pk = save_order_model(self.request.user, self.request.POST, request.session)
         return redirect("payment", pk=new_order_pk)
 
