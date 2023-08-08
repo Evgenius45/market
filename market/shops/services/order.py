@@ -1,13 +1,14 @@
 from decimal import Decimal
 from typing import Any
-
-from django.conf import settings
 from django.db.models import F, Sum
 from django.db import transaction
+from django.conf import settings
 
 from cart.models import CartItem, Cart
 from shops.models import OrderOffer, OrderStatusChange, OrderStatus, Order
-
+MIN_PRICE_OFFER = Decimal(2000.00)
+DELIVERY_EXPRESS = Decimal(500.00)
+DELIVERY_ORDINARY = Decimal(200.00)
 
 def pryce_delivery(r_user: Any) -> dict:
     """Расчет стоимости доставки"""
@@ -16,21 +17,20 @@ def pryce_delivery(r_user: Any) -> dict:
         .select_related("offer__product", "offer__shop")
         .annotate(summ_offer=F("offer__price") * F("quantity"))
     )
-    min_price_offer = Decimal(2000.00)
-    delivery_express = Decimal(500.00)
-    delivery_ordinary = Decimal(200.00)
-    cart_count_shop = cart_list.all().values_list("offer__shop").distinct().count()
-    total_cost = cart_list.all().aggregate(summ=Sum("summ_offer"))["summ"]
 
-    if total_cost > min_price_offer and cart_count_shop == 1:
-        delivery_ordinary = Decimal(0.00)
-    total_cost_delivery_ordinary = total_cost + delivery_ordinary
-    total_cost_delivery_express = total_cost + delivery_express
+    cart_count_shop = cart_list.all().values_list("offer__shop").distinct().count()
+    total_cost = Decimal(cart_list.all().aggregate(summ=Sum("summ_offer"))["summ"])
+
+    if total_cost > MIN_PRICE_OFFER and cart_count_shop == 1:
+        total_cost_delivery_ordinary = total_cost
+    else:
+        total_cost_delivery_ordinary = total_cost + DELIVERY_ORDINARY
+    total_cost_delivery_express = total_cost + DELIVERY_EXPRESS
     return {
         "total_cost_ordinary": total_cost_delivery_ordinary,
         "total_cost_express": total_cost_delivery_express,
-        "delivery_express": delivery_express,
-        "delivery_ordinary": delivery_ordinary,
+        "delivery_express": DELIVERY_EXPRESS,
+        "delivery_ordinary": DELIVERY_ORDINARY,
         "query_set_cart": cart_list,
     }
 

@@ -105,7 +105,7 @@
                             <div class="form-group">
                                 <div>
                                     <label class="toggle">
-                                        <input type="radio" name="delivery" value="ORDINARY" checked="checked" /><span class="toggle-box"></span><span class="toggle-text">{% trans %}Обычная доставка{% endtrans %}</span>
+                                        <input type="radio" name="delivery" value="ORDINARY" checked="checked" /><span class="toggle-box"></span><span class="toggle-text" id="ord">{% trans %}Обычная доставка{% endtrans %}</span>
                                     </label>
                                 </div>
                                 <div>
@@ -135,7 +135,7 @@
                             <div class="form-group">
                                 <div>
                                     <label class="toggle">
-                                        <input type="radio" name="pay" value="ONLINE" checked="checked" /><span class="toggle-box"></span><span class="toggle-text">{% trans %}Онлайн картой{% endtrans %}</span>
+                                        <input type="radio" name="pay" value="ONLINE" checked="checked" /><span class="toggle-box"></span><span class="toggle-text" id="online_pay">{% trans %}Онлайн картой{% endtrans %}</span>
                                     </label>
                                 </div>
                                 <div>
@@ -263,7 +263,9 @@
     </div>
 <script>
     var delivery = [{{ cart_list.delivery_express }},
-                    {{ cart_list.total_cost_express }}
+                    {{ cart_list.total_cost_express }},
+                    {{ cart_list.delivery_ordinary }},
+                    {{ cart_list.total_cost_ordinary }}
                     ];
 
     function copyaddress(step1, step2) {
@@ -279,10 +281,17 @@
                 document.getElementById("delivery_infoBlock").innerHTML = document.getElementById("exp").innerHTML;
                 document.getElementById("delivery-cost").innerHTML = delivery[0] + " Руб";
                 document.getElementById("total-express").innerHTML = delivery[1] + " Руб";
-                 }
+                 } else {
+                document.getElementById("delivery_infoBlock").innerHTML = document.getElementById("ord").innerHTML;
+                document.getElementById("delivery-cost").innerHTML = delivery[2] + " Руб";
+                document.getElementById("total-express").innerHTML = delivery[3] + " Руб";
+            }
+
                 console.log(formData.get("pay-order"))
             if (formData.get("pay") === "SOMEONE"){
-                document.getElementById("pay_infoBlock").innerHTML = document.getElementById("some_one").innerHTML}
+                document.getElementById("pay_infoBlock").innerHTML = document.getElementById("some_one").innerHTML} else {
+                document.getElementById("pay_infoBlock").innerHTML = document.getElementById("online_pay").innerHTML
+            }
 
     }
 
