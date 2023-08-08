@@ -116,7 +116,7 @@
                                         <strong class="Cart-title">{% trans %}Итого{% endtrans %}:<span class="Cart-price">{{ order.total_cost }}$</span>
                                         </strong>
                                     </div>
-                                    {%  if order.status |string() == "Оплата не выполнена" or "Новый" %}
+                                    {%  if order.status |string() == "Оплата не выполнена" or order.status |string() == "Новый" %}
                                     <div class="Cart-block"><a class="btn btn_primary btn_lg" href="{{ url("payment", pk=order.pk) }}">{% trans %}Оплатить{% endtrans %}</a>
                                     </div>
                                     {% endif %}

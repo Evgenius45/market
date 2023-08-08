@@ -246,7 +246,9 @@ class PaymentView(LoginRequiredMixin, View):
         if form.is_valid():
             requests.post(settings.PAY_URL, data={"card_number": form.cleaned_data["card_number"], "order_number": pk})
             update_order_status(pk, SRC_ORDER_STATUS_PK, DST_ORDER_STATUS_PK)
-            return redirect("catalog:show_product")
+            return render(request,
+                          "market/payment/paymen_somone.jinja2",
+                          context={"fin_pay": "«Ждём подтверждения оплаты платёжной системы»"})
 
         query_order = Order.objects.get(pk=pk)
         context = {"form": form, "pay": query_order.pay, "order": query_order}
